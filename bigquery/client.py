@@ -506,7 +506,7 @@ class BigQueryClient(object):
 
         return table
 
-    def create_table(self, dataset, table, schema, expiration_time=None):
+    def create_table(self, dataset, table, schema, expiration_time=None, partition=False):
         """Create a new table in the dataset.
 
         Parameters
@@ -538,6 +538,11 @@ class BigQueryClient(object):
 
         if expiration_time is not None:
             body['expirationTime'] = expiration_time
+
+        if partition:
+            body['timePartitioning'] = {
+                "type": "DAY"
+            }
 
         try:
             table = self.bigquery.tables().insert(
