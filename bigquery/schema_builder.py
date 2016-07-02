@@ -72,7 +72,7 @@ def describe_field(k, v, timestamp_parser=default_timestamp_parser):
     """
 
     def bq_schema_field(name, bq_type, mode):
-        return {"name": name, "type": bq_type, "mode": mode}
+        return {"name": name, "type": bq_type.upper(), "mode": mode.upper()}
 
     if isinstance(v, list):
         if len(v) == 0:
