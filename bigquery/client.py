@@ -609,6 +609,7 @@ class BigQueryClient(object):
             result = self.bigquery.tables().update(
                 projectId=self.project_id,
                 datasetId=dataset,
+                tableId=table,
                 body=body
             ).execute()
             if self.swallow_results:
