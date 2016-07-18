@@ -563,7 +563,7 @@ class BigQueryClient(object):
             else:
                 return {}
 
-    def update_table(self, dataset, table, schema):
+    def update_table(self, dataset, table, schema, partition=False):
         """Update an existing table in the dataset.
 
         Parameters
@@ -590,6 +590,11 @@ class BigQueryClient(object):
                 'datasetId': dataset
             }
         }
+
+        if partition:
+            body['timePartitioning'] = {
+                "type": "DAY"
+            }
 
         try:
             result = self.bigquery.tables().update(
