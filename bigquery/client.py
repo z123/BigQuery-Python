@@ -1100,7 +1100,7 @@ class BigQueryClient(object):
 
         print('Waiting for job to finish...')
 
-        status_request = bigquery.jobs().get(
+        status_request = self.bigquery.jobs().get(
             projectId=job['jobReference']['projectId'],
             jobId=job['jobReference']['jobId'])
 
