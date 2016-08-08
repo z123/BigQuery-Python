@@ -1074,7 +1074,7 @@ class BigQueryClient(object):
         # Post to the jobs resource using the client's media upload interface. See:
         # http://developers.google.com/api-client-library/python/guide/media_upload
         insert_request = self.bigquery.jobs().insert(
-            projectId=project_id,
+            projectId=self.project_id,
             # Provide a configuration object. See:
             # https://cloud.google.com/bigquery/docs/reference/v2/jobs#resource
             body={
