@@ -1048,6 +1048,74 @@ class BigQueryClient(object):
         self._raise_insert_exception_if_error(job_resource)
         return job_resource
 
+    def load_data(
+            self,
+            schema_path=None,
+            data_path=None,
+            dataset_id=None,
+            table_id=None
+    ):
+        """Loads the given data file into BigQuery.
+
+        Args:
+            schema_path: the path to a file containing a valid bigquery schema.
+                see https://cloud.google.com/bigquery/docs/reference/v2/tables
+            data_path: the name of the file to insert into the table.
+            project_id: The project id that the table exists under. This is also
+                assumed to be the project id this request is to be made under.
+            dataset_id: The dataset id of the destination table.
+            table_id: The table id to load data into.
+        """
+        # Infer the data format from the name of the data file.
+        source_format = 'CSV'
+        if data_path[-5:].lower() == '.json':
+            source_format = 'NEWLINE_DELIMITED_JSON'
+
+        # Post to the jobs resource using the client's media upload interface. See:
+        # http://developers.google.com/api-client-library/python/guide/media_upload
+        insert_request = self.bigquery.jobs().insert(
+            projectId=project_id,
+            # Provide a configuration object. See:
+            # https://cloud.google.com/bigquery/docs/reference/v2/jobs#resource
+            body={
+                'configuration': {
+                    'load': {
+                        'schema': {
+                            'fields': json.load(open(schema_path, 'r'))
+                        },
+                        'destinationTable': {
+                            'projectId': self.project_id,
+                            'datasetId': dataset_id,
+                            'tableId': table_id
+                        },
+                        'sourceFormat': source_format,
+                    }
+                }
+            },
+            media_body=MediaFileUpload(
+                data_path,
+                mimetype='application/octet-stream'))
+        job = insert_request.execute()
+
+        print('Waiting for job to finish...')
+
+        status_request = bigquery.jobs().get(
+            projectId=job['jobReference']['projectId'],
+            jobId=job['jobReference']['jobId'])
+
+        # Poll the job until it finishes.
+        while True:
+            result = status_request.execute(num_retries=2)
+
+            if result['status']['state'] == 'DONE':
+                if result['status'].get('errors'):
+                    raise RuntimeError('\n'.join(
+                        e['message'] for e in result['status']['errors']))
+                print('Job complete.')
+                return
+
+            time.sleep(1)
+
     def write_to_table(
             self,
             query,
