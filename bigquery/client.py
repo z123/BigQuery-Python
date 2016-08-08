@@ -1115,7 +1115,7 @@ class BigQueryClient(object):
                 print('Job complete.')
                 return
 
-            time.sleep(1)
+            sleep(1)
 
     def write_to_table(
             self,
