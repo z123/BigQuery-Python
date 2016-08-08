@@ -8,6 +8,7 @@ from io import StringIO
 from time import sleep, time
 
 import six
+from apiclient.http import MediaFileUpload
 from bigquery.errors import (BigQueryTimeoutException, JobExecutingException,
                              JobInsertException, UnfinishedQueryException)
 from googleapiclient.discovery import build, DISCOVERY_URI
