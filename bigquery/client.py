@@ -1095,7 +1095,9 @@ class BigQueryClient(object):
             },
             media_body=MediaFileUpload(
                 data_path,
-                mimetype='application/octet-stream'))
+                mimetype='application/octet-stream',
+                chunksize=1048576,
+                resumable=True))
         job = insert_request.execute()
 
         print('Waiting for job to finish...')
