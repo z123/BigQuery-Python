@@ -1054,7 +1054,7 @@ class BigQueryClient(object):
             schema_path=None,
             data_path=None,
             dataset_id=None,
-            table_id=None
+            table_id=None,
             create_disposition=None,
             write_disposition=None
     ):
