@@ -1055,6 +1055,8 @@ class BigQueryClient(object):
             data_path=None,
             dataset_id=None,
             table_id=None
+            create_disposition=None,
+            write_disposition=None
     ):
         """Loads the given data file into BigQuery.
 
@@ -1068,9 +1070,15 @@ class BigQueryClient(object):
             table_id: The table id to load data into.
         """
         # Infer the data format from the name of the data file.
-        source_format = 'CSV'
+        source_format = JOB_SOURCE_FORMAT_CSV
         if data_path[-5:].lower() == '.json':
-            source_format = 'NEWLINE_DELIMITED_JSON'
+            source_format = JOB_SOURCE_FORMAT_NEWLINE_DELIMITED_JSON
+
+        if not create_disposition:
+            create_disposition = JOB_CREATE_IF_NEEDED
+
+        if not write_disposition:
+            write_disposition = JOB_WRITE_APPEND
 
         # Post to the jobs resource using the client's media upload interface. See:
         # http://developers.google.com/api-client-library/python/guide/media_upload
@@ -1090,6 +1098,8 @@ class BigQueryClient(object):
                             'tableId': table_id
                         },
                         'sourceFormat': source_format,
+                        'createDisposition': create_disposition,
+                        'writeDisposition': write_disposition
                     }
                 }
             },
